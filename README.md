@@ -84,7 +84,7 @@ Ancak birçok girişimci ve araştırmacı, başvuru sürecinde fikirlerini doğ
 1. **Projeyi klonlayın**  
 ```bash
 git clone https://github.com/MuratKomurcu1/Tubitak-EPDK-AI-Proje-Asistan.git
-cd proje-asistani
+cd Tubitak-EPDK-AI-Proje-Asistan
 ```
 2. **Bağımlılıkları yükleyin**
  ```bash
