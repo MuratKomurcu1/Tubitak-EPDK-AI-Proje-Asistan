@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TÜBİTAK-EPDK Proje Asistanı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            background: rgba(30, 35, 58, 0.9);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #6366f1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .new-chat-btn {
+            background: #4f46e5;
+            border: none;
+        }
+
+        .new-chat-btn:hover {
+            background: #6366f1;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .chat-list {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-section-title {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 15px;
+        }
+
+        .chat-item {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .chat-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-item.active {
+            background: rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(99, 102, 241, 0.5);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .user-info.logged-in {
+            display: block;
+        }
+
+        .login-form {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .login-form.show {
+            display: flex;
+        }
+
+        .form-input {
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .auth-btn {
+            padding: 10px 16px;
+            background: #4f46e5;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background: #6366f1;
+        }
+
+        .auth-btn.secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .login-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .login-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            padding: 6px 12px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fecaca;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+        }
+
+        .logout-btn.show {
+            display: block;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            padding-bottom: 140px;
+        }
+
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .messages-container {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px 0 120px 0;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 20px 24px;
+            border-radius: 16px;
+            max-width: 85%;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #4f46e5;
+            margin-left: auto;
+            color: white;
+        }
+
+        .message.assistant {
+            background: rgba(255, 255, 255, 0.1);
+            margin-right: auto;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fecaca;
+            margin-right: auto;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-right: auto;
+            max-width: 200px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .welcome-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #ffffff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .input-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 30px;
+            background: rgba(30, 35, 58, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            resize: none;
+            min-height: 50px;
+        }
+
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .mode-selector {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .mode-selector option {
+            background: #2d3561;
+            color: white;
+            padding: 8px;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .send-btn {
+            background: #6366f1;
+        }
+
+        .send-btn:hover {
+            background: #4f46e5;
+        }
+
+        .send-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+        }
+
+        /* Analysis Results */
+        .analysis-result {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .analysis-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .programs-list {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+
+        .programs-list h4 {
+            color: #60a5fa;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .program-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 4px 0;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .welcome-title {
+                font-size: 32px;
+            }
+            
+            .welcome-text {
+                font-size: 16px;
+            }
+
+            .input-controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .mode-selector {
+                width: 100%;
+            }
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.info {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">TÜBİTAK-EPDK Asistanı</div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="assistant.showChatHistory()">
+                        <span>←</span>
+                        Sohbet Geçmişi
+                    </button>
+                    <button class="nav-btn new-chat-btn" onclick="assistant.startNewChat()">
+                        <span>+</span>
+                        Yeni Sohbet
+                    </button>
+                </div>
+                
+                <input type="text" class="search-box" placeholder="Sohbetlerde ara..." onkeyup="assistant.searchChats(this.value)">
+            </div>
+            
+            <div class="chat-list">
+                <div class="chat-section-title">Bugün</div>
+                <!-- Chat items will be dynamically added here -->
+            </div>
+            
+            <div class="sidebar-footer">
+                <!-- User info when logged in -->
+                <div class="user-info" id="userInfo">
+                    <div id="userDetails"></div>
+                </div>
+
+                <!-- Login form -->
+                <div class="login-form" id="loginForm">
+                    <input type="text" class="form-input" id="loginName" placeholder="İsim">
+                    <input type="email" class="form-input" id="loginEmail" placeholder="Email">
+                    <button class="auth-btn" onclick="assistant.register()">Kayıt Ol</button>
+                    <button class="auth-btn secondary" onclick="assistant.toggleLoginMode()">Giriş Yap</button>
+                </div>
+                
+                <button class="auth-btn" id="authToggle" onclick="assistant.toggleAuth()">Giriş Yap</button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-title">Proje Asistanı</div>
+                <div class="header-controls">
+                    <button class="logout-btn" id="logoutBtn" onclick="assistant.logout()">Çıkış</button>
+                </div>
+            </div>
+            
+            <div class="chat-area">
+                <div class="welcome-container" id="welcomeContainer">
+                    <h1 class="welcome-title">TÜBİTAK-EPDK Proje Asistanınız</h1>
+                    <p class="welcome-text">
+                        TÜBİTAK, EPDK ve KOSGEB hibe programları konusunda uzmanlaşmış yapay zeka asistanınız. 
+                        Proje fikirlerinizi olgunlaştırır, benzer projeleri tespit eder, kabul şansınızı artıracak 
+                        stratejiler sunar ve doküman hazırlık süreçlerinde yardımcı olur.
+                    </p>
+                </div>
+                
+                <div class="messages-container" id="messagesContainer">
+                    <!-- Messages will be added here dynamically -->
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator">
+                    <span>Asistan yazıyor</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea class="message-input" id="messageInput" placeholder="Proje fikrinizi paylaşın, hibe programı hakkında soru sorun..." rows="1"></textarea>
+                    
+                    <div class="input-controls">
+                        <select class="mode-selector" id="modeSelector">
+                            <option value="chat">Sohbet</option>
+                            <option value="analysis">Proje Analizi</option>
+                            <option value="analysis_ai">AI Analizi</option>
+                        </select>
+                        
+                        <button class="control-btn send-btn" id="sendBtn" onclick="assistant.sendMessage()">
+                            →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TubitakAssistant {
+            constructor() {
+                this.apiBaseUrl = 'http://localhost:5000';
+                this.jwtToken = localStorage.getItem('jwt_token');
+                this.currentUser = JSON.parse(localStorage.getItem('current_user') || 'null');
+                this.currentConversationId = null;
+                this.conversations = [];
+                this.isLoginMode = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupElements();
+                this.setupEventListeners();
+                this.updateAuthUI();
+                this.loadConversations();
+                
+                console.log('TÜBİTAK Asistanı başlatıldı');
+            }
+            
+            setupElements() {
+                this.welcomeContainer = document.getElementById('welcomeContainer');
+                this.messagesContainer = document.getElementById('messagesContainer');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.modeSelector = document.getElementById('modeSelector');
+                this.chatList = document.querySelector('.chat-list');
+                this.userInfo = document.getElementById('userInfo');
+                this.loginForm = document.getElementById('loginForm');
+                this.authToggle = document.getElementById('authToggle');
+                this.logoutBtn = document.getElementById('logoutBtn');
+            }
+            
+            setupEventListeners() {
+                // Enter to send message
+                this.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                
+                // Auto-resize textarea
+                this.messageInput.addEventListener('input', () => {
+                    this.messageInput.style.height = 'auto';
+                    this.messageInput.style.height = this.messageInput.scrollHeight + 'px';
+                });
+            }
+            
+            updateAuthUI() {
+                if (this.jwtToken && this.currentUser) {
+                    // Logged in state
+                    this.userInfo.classList.add('logged-in');
+                    this.loginForm.style.display = 'none';
+                    this.authToggle.style.display = 'none';
+                    this.logoutBtn.classList.add('show');
+                    
+                    document.getElementById('userDetails').innerHTML = `
+                        <strong>${this.currentUser.name}</strong><br>
+                        <span style="font-size: 12px; opacity: 0.7">${this.currentUser.email}</span>
+                    `;
+                } else {
+                    // Logged out state
+                    this.userInfo.classList.remove('logged-in');
+                    this.loginForm.style.display = 'none';
+                    this.authToggle.style.display = 'block';
+                    this.logoutBtn.classList.remove('show');
+                }
+            }
+            
+            toggleAuth() {
+                const loginForm = document.getElementById('loginForm');
+                const authToggle = document.getElementById('authToggle');
+                
+                if (loginForm.style.display === 'none' || !loginForm.style.display) {
+                    loginForm.style.display = 'flex';
+                    authToggle.style.display = 'none';
+                } else {
+                    loginForm.style.display = 'none';
+                    authToggle.style.display = 'block';
+                }
+            }
+            
+            toggleLoginMode() {
+                this.isLoginMode = !this.isLoginMode;
+                const nameInput = document.getElementById('loginName');
+                const submitBtn = this.loginForm.querySelector('.auth-btn');
+                const toggleBtn = this.loginForm.querySelector('.auth-btn.secondary');
+                
+                if (this.isLoginMode) {
+                    nameInput.style.display = 'none';
+                    submitBtn.textContent = 'Giriş Yap';
+                    submitBtn.onclick = () => this.login();
+                    toggleBtn.textContent = 'Kayıt Ol';
+                } else {
+                    nameInput.style.display = 'block';
+                    submitBtn.textContent = 'Kayıt Ol';
+                    submitBtn.onclick = () => this.register();
+                    toggleBtn.textContent = 'Giriş Yap';
+                }
+            }
+            
+            async register() {
+                const name = document.getElementById('loginName').value.trim();
+                const email = document.getElementById('loginEmail').value.trim();
+                
+                if (!name || !email) {
+                    this.showNotification('İsim ve email gerekli', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/api/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.jwtToken = data.token;
+                        this.currentUser = data.user;
+                        
+                        localStorage.setItem('jwt_token', this.jwtToken);
+                        localStorage.setItem('current_user', JSON.stringify(this.currentUser));
+                        
+                        this.updateAuthUI();
+                        this.showNotification('Başarıyla kayıt oldunuz!', 'success');
+                        
+                        // Clear form
+                        document.getElementById('loginName').value = '';
+                        document.getElementById('loginEmail').value = '';
+                        this.loginForm.classList.remove('show');
+                    } else {
+                        this.showNotification(data.error || 'Kayıt olurken hata oluştu', 'error');
+                    }
+                } catch (error) {
+                    this.showNotification('Bağlantı hatası: ' + error.message, 'error');
+                }
+            }
+            
+            async login() {
+                const email = document.getElementById('loginEmail').value.trim();
+                
+                if (!email) {
+                    this.showNotification('Email gerekli', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.jwtToken = data.token;
+                        this.currentUser = data.user;
+                        
+                        localStorage.setItem('jwt_token', this.jwtToken);
+                        localStorage.setItem('current_user', JSON.stringify(this.currentUser));
+                        
+                        this.updateAuthUI();
+                        this.showNotification('Başarıyla giriş yaptınız!', 'success');
+                        
+                        // Clear form and load user data
+                        document.getElementById('loginEmail').value = '';
+                        this.loginForm.classList.remove('show');
+                        this.loadConversations();
+                    } else {
+                        this.showNotification(data.error || 'Giriş yaparken hata oluştu', 'error');
+                    }
+                } catch (error) {
+                    this.showNotification('Bağlantı hatası: ' + error.message, 'error');
+                }
+            }
+            
+            logout() {
+                this.jwtToken = null;
+                this.currentUser = null;
+                this.currentConversationId = null;
+                
+                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('current_user');
+                
+                this.updateAuthUI();
+                this.clearChat();
+                this.showNotification('Çıkış yapıldı', 'info');
+            }
+            
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                const mode = this.modeSelector.value;
+                
+                if (!message) return;
+                
+                // Add user message to UI
+                this.addMessage(message, 'user');
+                this.messageInput.value = '';
+                this.messageInput.style.height = 'auto';
+                
+                this.showTyping();
+                
+                try {
+                    if (mode === 'chat') {
+                        await this.sendChatMessage(message);
+                    } else if (mode === 'analysis' || mode === 'analysis_ai') {
+                        await this.sendAnalysisRequest(message, mode === 'analysis_ai');
+                    }
+                } catch (error) {
+                    this.hideTyping();
+                    this.addMessage('Hata: ' + error.message, 'error');
+                }
+            }
+            
+            async sendChatMessage(message) {
+                const headers = { 'Content-Type': 'application/json' };
+                if (this.jwtToken) headers.Authorization = `Bearer ${this.jwtToken}`;
+                
+                const response = await fetch(`${this.apiBaseUrl}/api/chat/message`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        message,
+                        conversationId: this.currentConversationId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.currentConversationId = data.data.conversation_id;
+                    this.hideTyping();
+                    this.addMessage(data.data.bot_message.content, 'assistant');
+                    
+                    // YENI: Asenkron mesajları kontrol et
+                    this.pollForNewMessages();
+                } else {
+                    throw new Error(data.error || 'Mesaj gönderilemedi');
+                }
+            }
+
+            pollForNewMessages() {
+                let pollCount = 0;
+                const maxPolls = 10; // 10 saniye kontrol et
+                
+                const poll = setInterval(async () => {
+                    pollCount++;
+                    
+                    if (pollCount > maxPolls) {
+                        clearInterval(poll);
+                        return;
+                    }
+                    
+                    try {
+                        // Son mesajları al
+                        const response = await fetch(`${this.apiBaseUrl}/api/chat/messages/${this.currentConversationId}`, {
+                            headers: this.jwtToken ? { 'Authorization': `Bearer ${this.jwtToken}` } : {}
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.newMessages && data.newMessages.length > 0) {
+                                data.newMessages.forEach(msg => {
+                                    if (msg.sender_type === 'bot') {
+                                        this.addMessage(msg.content, 'assistant');
+                                    }
+                                });
+                                clearInterval(poll);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Polling error:', error);
+                    }
+                }, 1000);
+            }
+            
+            async sendAnalysisRequest(message, useAI = false) {
+                if (!this.jwtToken) {
+                    this.hideTyping();
+                    this.addMessage('Proje analizi için giriş yapmalısınız.', 'error');
+                    return;
+                }
+                
+                // Parse project info from message (simple approach)
+                const response = await fetch(`${this.apiBaseUrl}/api/analysis/project`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.jwtToken}`
+                    },
+                    body: JSON.stringify({
+                        title: 'Kullanıcı Projesi',
+                        description: message,
+                        conversationId: this.currentConversationId,
+                        useAI
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.hideTyping();
+                    this.addAnalysisResult(data.data);
+                } else {
+                    throw new Error(data.error || 'Analiz yapılamadı');
+                }
+            }
+            
+            addMessage(content, sender) {
+                this.showChatArea();
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                messageDiv.innerHTML = content;
+                
+                this.messagesContainer.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            addAnalysisResult(analysisData) {
+                this.showChatArea();
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'message assistant';
+                
+                let html = `
+                    <div class="analysis-result">
+                        <div class="analysis-score">
+                            <span>Genel Değerlendirme</span>
+                            <span class="score-value">${analysisData.overall_score}/100</span>
+                        </div>
+                        <p><strong>Güven Seviyesi:</strong> ${this.translateConfidence(analysisData.confidence_level)}</p>
+                        <p><strong>Başarı Tahmini:</strong> %${analysisData.estimated_success_rate}</p>
+                `;
+                
+                if (analysisData.suitable_programs && analysisData.suitable_programs.length > 0) {
+                    html += `
+                        <div class="programs-list">
+                            <h4>Uygun Programlar:</h4>
+                            ${analysisData.suitable_programs.map(program => 
+                                `<div class="program-item">${program}</div>`
+                            ).join('')}
+                        </div>
+                    `;
+                }
+                
+                if (analysisData.strengths && analysisData.strengths.length > 0) {
+                    html += `<p><strong>Güçlü Yönler:</strong></p><ul>`;
+                    analysisData.strengths.forEach(strength => {
+                        html += `<li>${strength}</li>`;
+                    });
+                    html += `</ul>`;
+                }
+                
+                if (analysisData.improvement_suggestions && analysisData.improvement_suggestions.length > 0) {
+                    html += `<p><strong>İyileştirme Önerileri:</strong></p><ul>`;
+                    analysisData.improvement_suggestions.forEach(suggestion => {
+                        html += `<li>${suggestion}</li>`;
+                    });
+                    html += `</ul>`;
+                }
+                
+                if (analysisData.analysis_method === 'hybrid_ai_rule_based') {
+                    html += `<p style="font-size: 12px; opacity: 0.7; margin-top: 12px;">🤖 AI destekli analiz kullanıldı</p>`;
+                }
+                
+                html += `</div>`;
+                
+                resultDiv.innerHTML = html;
+                this.messagesContainer.appendChild(resultDiv);
+                this.scrollToBottom();
+            }
+            
+            translateConfidence(level) {
+                const translations = {
+                    'high': 'Yüksek',
+                    'medium': 'Orta',
+                    'low': 'Düşük'
+                };
+                return translations[level] || level;
+            }
+            
+            showChatArea() {
+                this.welcomeContainer.style.display = 'none';
+                this.messagesContainer.style.display = 'flex';
+            }
+            
+            showTyping() {
+                this.typingIndicator.style.display = 'flex';
+                this.scrollToBottom();
+            }
+            
+            hideTyping() {
+                this.typingIndicator.style.display = 'none';
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    const chatArea = document.querySelector('.chat-area');
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }, 100);
+            }
+            
+            startNewChat() {
+                this.currentConversationId = null;
+                this.clearChat();
+            }
+            
+            clearChat() {
+                this.messagesContainer.innerHTML = '';
+                this.messagesContainer.style.display = 'none';
+                this.welcomeContainer.style.display = 'flex';
+                this.hideTyping();
+            }
+            
+            async loadConversations() {
+                if (!this.jwtToken) return;
+                
+                // Implementation for loading conversation history
+                // Will be added when backend supports it
+            }
+            
+            async showChatHistory() {
+                if (!this.jwtToken) {
+                    this.showNotification('Sohbet geçmişi için giriş yapmalısınız', 'info');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/api/chat/conversations`, {
+                        headers: { 'Authorization': `Bearer ${this.jwtToken}` }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.updateChatList(data.data);
+                        this.showNotification(`${data.data.length} konuşma bulundu`, 'success');
+                    }
+                } catch (error) {
+                    this.showNotification('Sohbet geçmişi yüklenemedi', 'error');
+                }
+            }
+            searchChats(query) {
+                // Implementation for chat search
+                // Will be added when backend supports it
+            }
+            
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // Show notification
+                setTimeout(() => notification.classList.add('show'), 100);
+                
+                // Hide and remove notification
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                }, 3000);
+            }
+        }
+        
+        // Initialize assistant
+        let assistant;
+        document.addEventListener('DOMContentLoaded', () => {
+            assistant = new TubitakAssistant();
+        });
+    </script>
+</body>
+</html>
